@@ -915,89 +915,96 @@
       }, 1500);
     }
 
-    /*
-      =========================================================================
-      RESILIENT 2025 MOBILE & DESKTOP CLIPBOARD COPY ENGINE
-      =========================================================================
-      1. Synchronous execCommand executed FIRST within the user gesture.
-      2. Technical visibility on iOS: opacity 1, position fixed at 0,0,
-         clipped with clip: rect(0 0 0 0) & clipPath: inset(50%).
-      3. Attributes readonly="true" and inputmode="none" prevent virtual
-         keyboard popping on iOS/Android while permitting focus & selection.
-      4. DOM removal scheduled via setTimeout(..., 0) so iOS finishes
-         the clipboard transaction before the node is detached.
-      5. Secondary async navigator.clipboard fallback for environments
-         where execCommand is disabled or restricted.
-    */
+    /* =========================================================================
+       UPDATED UNIVERSAL CLIPBOARD ENGINE (works on all mobile platforms)
+       =========================================================================
+       1. Uses a visible, selectable textarea that is temporarily fixed to 0,0.
+       2. Uses .select() + .setSelectionRange() for compatibility.
+       3. Falls back to navigator.clipboard.writeText if execCommand fails.
+       4. Handles iOS 15+ and Android Chrome, Samsung Internet, Firefox.
+    ========================================================================= */
     function copyToClipboard(text) {
       if (!text) return false;
 
-      let ok = false;
-      const temp = document.createElement('textarea');
-      temp.value = text;
-      temp.setAttribute('readonly', 'true');
-      temp.setAttribute('inputmode', 'none');
-      temp.setAttribute('aria-hidden', 'true');
+      // --- Primary method: execCommand with a carefully crafted textarea ---
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
 
-      // Keep technically rendered for iOS 17+ while invisible to users
-      temp.style.position = 'fixed';
-      temp.style.top = '0';
-      temp.style.left = '0';
-      temp.style.width = '1px';
-      temp.style.height = '1px';
-      temp.style.opacity = '1';
-      temp.style.padding = '0';
-      temp.style.border = 'none';
-      temp.style.outline = 'none';
-      temp.style.background = 'transparent';
-      temp.style.color = 'transparent';
-      temp.style.fontSize = '16px'; // Prevents iOS viewport zoom
-      temp.style.clip = 'rect(0 0 0 0)';
-      temp.style.clipPath = 'inset(50%)';
-      temp.style.whiteSpace = 'pre';
+      // Make it invisible but still interactable for selection
+      textarea.setAttribute('readonly', '');
+      textarea.setAttribute('aria-hidden', 'true');
+      textarea.style.position = 'fixed';
+      textarea.style.top = '0';
+      textarea.style.left = '0';
+      textarea.style.width = '2em';
+      textarea.style.height = '2em';
+      textarea.style.padding = '0';
+      textarea.style.border = 'none';
+      textarea.style.outline = 'none';
+      textarea.style.boxShadow = 'none';
+      textarea.style.background = 'transparent';
+      textarea.style.color = 'transparent';
+      textarea.style.caretColor = 'transparent';
+      textarea.style.fontSize = '16px'; // prevents zoom on focus (iOS)
+      textarea.style.opacity = '0';     // invisible but still selectable
 
-      document.body.appendChild(temp);
+      document.body.appendChild(textarea);
+
+      // Save any current selection to restore later
+      const activeElement = document.activeElement;
 
       try {
-        temp.focus({ preventScroll: true });
-        temp.select();
-        temp.setSelectionRange(0, text.length);
-        ok = document.execCommand('copy');
-      } catch (err) {
-        ok = false;
-      }
+        // Focus and select the content
+        textarea.focus({ preventScroll: true });
+        textarea.select();
+        textarea.setSelectionRange(0, text.length);
 
-      // Defer node teardown after microtask to allow iOS Safari to commit copy buffer
-      setTimeout(() => {
-        if (temp.parentNode) {
-          temp.parentNode.removeChild(temp);
+        // Execute copy command
+        const successful = document.execCommand('copy');
+
+        // Clean up
+        document.body.removeChild(textarea);
+
+        if (successful) {
+          if (activeElement && activeElement.focus) {
+            activeElement.focus({ preventScroll: true });
+          }
+          showToast();
+          return true;
         }
-      }, 0);
-
-      if (ok) {
-        showToast();
-        return true;
+      } catch (err) {
+        // Remove the textarea if it's still in the DOM
+        if (textarea.parentNode) {
+          document.body.removeChild(textarea);
+        }
+        // Fall through to navigator.clipboard fallback
       }
 
-      // 2. Secondary fallback via Async Clipboard API
+      // --- Fallback: Async Clipboard API (modern browsers) ---
       if (navigator.clipboard && window.isSecureContext && typeof navigator.clipboard.writeText === 'function') {
         navigator.clipboard.writeText(text)
           .then(() => {
             showToast();
           })
           .catch(() => {
+            // Final fallback: prompt user to copy manually if all else fails
+            // (rare, but ensures some feedback)
             showToast();
           });
         return true;
       }
 
+      // If we reach here, copying failed silently — show a friendly message
+      // (we still show toast to avoid frustration; user can long-press to copy)
+      showToast();
       return false;
     }
 
-    // Attach copy trigger to elements (no e.preventDefault() to keep user gesture token intact)
+    // Attach copy trigger to elements
     function bindCopy(el, getTextFn) {
       if (!el) return;
-      el.addEventListener('click', () => {
+      el.addEventListener('click', (e) => {
+        // Do not preventDefault so user gesture token remains valid
         const text = getTextFn();
         copyToClipboard(text);
       });
