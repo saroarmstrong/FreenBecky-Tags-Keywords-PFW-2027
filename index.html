@@ -37,12 +37,7 @@
     }
     .serif{font-family:Georgia,"Times New Roman",serif}
 
-    /* 
-      =======================================================
-      THEME: PARIS FASHION WEEK SS27 DUAL HERO BACKGROUND
-      Miu Miu Travertine (Left) × Valentino Crimson (Right)
-      =======================================================
-    */
+    /* Dual Ambient Lighting: Palais d'Iena (Left) × Valentino Crimson (Right) */
     .hero{
       min-height:100svh;
       display:grid;
@@ -109,7 +104,6 @@
       align-items:center;
     }
 
-    /* Two-line balanced responsive kicker */
     .kicker{
       display:inline-flex;
       flex-direction:column;
@@ -135,7 +129,6 @@
       white-space:nowrap;
     }
 
-    /* Fixed single-line heading per artist */
     h1{
       font-weight:400;
       font-size:clamp(1.75rem, 5.2vw, 3.1rem);
@@ -170,7 +163,6 @@
       max-width:520px;
     }
 
-    /* Event Countdown Cards */
     .hero-events{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -917,84 +909,109 @@
       textPostEl.textContent = masterPools.post[idxPost].replace(/\[NAME\]/g, currentTarget);
     }
 
-    let toastTimer;
+    let toastTimer = null;
     function showToast() {
       toastEl.textContent = 'copied';
       toastEl.classList.add('show');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1500);
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toastEl.classList.remove('show');
+      }, 1500);
     }
 
     /*
-      ===============================================================
-      PHONE & MOBILE-PROOF COPY ENGINE (iOS Safari, Android, In-App)
-      ===============================================================
+      =========================================================================
+      RESILIENT MOBILE CLIPBOARD ENGINE
+      Fixes breakdown caused by iOS selection locks, asynchronous gesture decay,
+      or accumulated hidden DOM textareas.
+      =========================================================================
     */
-    function fallbackMobileCopy(text) {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      // Prevent screen jumping and zoom on mobile Safari
-      ta.setAttribute('readonly', '');
-      ta.style.position = 'fixed';
-      ta.style.top = '0';
-      ta.style.left = '0';
-      ta.style.width = '2em';
-      ta.style.height = '2em';
-      ta.style.padding = '0';
-      ta.style.border = 'none';
-      ta.style.outline = 'none';
-      ta.style.boxShadow = 'none';
-      ta.style.background = 'transparent';
-      ta.style.fontSize = '16px';
-      ta.style.opacity = '0.01';
-      document.body.appendChild(ta);
-
-      // iOS Safari selection range handling
-      const isIOS = navigator.userAgent.match(/ipad|ipod|iphone/i);
-      if (isIOS) {
-        const range = document.createRange();
-        range.selectNodeContents(ta);
-        const sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(range);
-        ta.setSelectionRange(0, 999999);
-      } else {
-        ta.focus();
-        ta.select();
-      }
-
-      let success = false;
+    function execCommandFallback(text) {
+      let temp = null;
+      let ok = false;
       try {
-        success = document.execCommand('copy');
-      } catch (err) {
-        success = false;
-      }
+        temp = document.createElement('textarea');
+        temp.value = text;
+        temp.setAttribute('readonly', '');
+        temp.setAttribute('tabindex', '-1');
+        temp.setAttribute('aria-hidden', 'true');
+        // Prevent layout shift, zooming, and keyboard invocation on iOS
+        temp.style.position = 'fixed';
+        temp.style.top = '-9999px';
+        temp.style.left = '-9999px';
+        temp.style.fontSize = '16px';
+        temp.style.opacity = '0';
+        temp.style.pointerEvents = 'none';
 
-      document.body.removeChild(ta);
-      if (success) {
-        showToast();
+        document.body.appendChild(temp);
+
+        // Clear existing selections to prevent locked ranges
+        const sel = window.getSelection();
+        if (sel) {
+          sel.removeAllRanges();
+        }
+
+        // iOS Range selection
+        const range = document.createRange();
+        range.selectNodeContents(temp);
+        if (sel) {
+          sel.addRange(range);
+        }
+        temp.setSelectionRange(0, text.length);
+
+        ok = document.execCommand('copy');
+
+        // Always clean up the selection range immediately
+        if (sel) {
+          sel.removeAllRanges();
+        }
+      } catch (err) {
+        ok = false;
+      } finally {
+        if (temp && temp.parentNode) {
+          temp.parentNode.removeChild(temp);
+        }
       }
+      return ok;
     }
 
     function copyToClipboard(text) {
       if (!text) return;
 
-      // Handle async Clipboard API if allowed and in secure context
-      if (window.isSecureContext && navigator.clipboard && navigator.clipboard.writeText) {
+      // 1. Synchronously attempt the fallback first on touch/mobile devices
+      // to ensure the user gesture token is not consumed by microtasks.
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        const fallbackSuccess = execCommandFallback(text);
+        if (fallbackSuccess) {
+          showToast();
+          return;
+        }
+      }
+
+      // 2. Try the modern async Clipboard API if available and permitted
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
         navigator.clipboard.writeText(text)
           .then(() => {
             showToast();
           })
           .catch(() => {
-            fallbackMobileCopy(text);
+            // If async fails (e.g. permission revoked in iframe/webview), fallback synchronously
+            if (execCommandFallback(text)) {
+              showToast();
+            }
           });
       } else {
-        fallbackMobileCopy(text);
+        if (execCommandFallback(text)) {
+          showToast();
+        }
       }
     }
 
-    // Bind both tap/click with touch consideration
-    function addCopyTrigger(el, getTextFn) {
+    // Attach copy trigger to elements
+    function bindCopy(el, getTextFn) {
+      if (!el) return;
       el.addEventListener('click', (e) => {
         e.preventDefault();
         const text = getTextFn();
@@ -1002,14 +1019,14 @@
       });
     }
 
-    // Attach to caption display cards
-    addCopyTrigger(document.getElementById('cardWord'), () => textWordEl.textContent);
-    addCopyTrigger(document.getElementById('cardShort'), () => textShortEl.textContent);
-    addCopyTrigger(document.getElementById('cardPost'), () => textPostEl.textContent);
+    // Bind to caption display cards
+    bindCopy(document.getElementById('cardWord'), () => textWordEl.textContent);
+    bindCopy(document.getElementById('cardShort'), () => textShortEl.textContent);
+    bindCopy(document.getElementById('cardPost'), () => textPostEl.textContent);
 
-    // Attach to campaign copyable boxes
+    // Bind to all campaign copyable boxes
     document.querySelectorAll('.campaign-block.copyable').forEach(box => {
-      addCopyTrigger(box, () => box.getAttribute('data-copy'));
+      bindCopy(box, () => box.getAttribute('data-copy'));
     });
 
     // Side-by-side Generate Next Buttons
