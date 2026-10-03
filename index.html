@@ -108,14 +108,32 @@
       align-items:center;
     }
 
+    /* Two-line balanced responsive kicker */
     .kicker{
-      font-size:.74rem;
-      letter-spacing:.36em;
-      color:var(--gold);
-      text-transform:uppercase;
+      display:inline-flex;
+      flex-direction:column;
+      align-items:center;
+      gap:6px;
       margin-bottom:24px;
       max-width:520px;
+      width:100%;
+      text-transform:uppercase;
     }
+    .kicker-top{
+      font-size:clamp(0.78rem, 2.8vw, 0.92rem);
+      letter-spacing:clamp(0.28em, 1.2vw, 0.42em);
+      color:var(--gold);
+      font-weight:700;
+    }
+    .kicker-sub{
+      font-size:clamp(0.64rem, 2.2vw, 0.74rem);
+      letter-spacing:clamp(0.22em, 0.8vw, 0.32em);
+      color:var(--cream);
+      opacity:0.85;
+      font-weight:400;
+      white-space:nowrap;
+    }
+
     h1{
       font-weight:400;
       font-size:clamp(2.1rem, 7vw, 3.4rem);
@@ -432,7 +450,10 @@
   <header class="hero">
     <div class="hero-glow"></div>
     <div class="wrap hero-content">
-      <div class="kicker">FREENBECKY Paris Fashion Week · SS27</div>
+      <div class="kicker">
+        <span class="kicker-top">FREENBECKY</span>
+        <span class="kicker-sub">Paris Fashion Week · SS27</span>
+      </div>
       <h1 class="serif">
         BECKY x MIU MIU
         <span class="hero-amp">&</span>
@@ -878,9 +899,25 @@
     }
 
     function copyToClipboard(text) {
-      navigator.clipboard.writeText(text).then(() => {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(showToast).catch(() => fallbackCopy(text));
+      } else {
+        fallbackCopy(text);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
         showToast();
-      });
+      } catch (e) {}
+      document.body.removeChild(ta);
     }
 
     // Click on individual caption display cards to copy
