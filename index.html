@@ -114,7 +114,7 @@
       flex-direction:column;
       align-items:center;
       gap:6px;
-      margin-bottom:24px;
+      margin-bottom:20px;
       max-width:520px;
       width:100%;
       text-transform:uppercase;
@@ -134,36 +134,47 @@
       white-space:nowrap;
     }
 
+    /* Fixed single-line heading per artist without unwanted desktop wrapping */
     h1{
       font-weight:400;
-      font-size:clamp(2.1rem, 7vw, 3.4rem);
-      line-height:1.15;
-      letter-spacing:-.02em;
+      font-size:clamp(1.75rem, 5.2vw, 3.1rem);
+      line-height:1.2;
+      letter-spacing:-.015em;
       margin:0 auto;
-      max-width:520px;
+      max-width:820px;
+      width:100%;
       text-align:center;
       text-shadow:0 2px 20px rgba(0,0,0,.6);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+    .title-line{
+      display:block;
+      white-space:nowrap;
     }
     .hero-amp{
       display:block;
-      font:italic 400 .45em Georgia;
+      font:italic 400 clamp(1.1rem, 3.5vw, 1.6rem) Georgia;
       color:var(--gold);
-      margin:.25em 0;
+      margin:4px 0;
+      line-height:1;
     }
     .hero-sub{
       font-size:.78rem;
       letter-spacing:.26em;
       text-transform:uppercase;
       color:var(--cream);
-      margin:26px auto 10px;
+      margin:24px auto 10px;
       max-width:520px;
     }
 
+    /* Event Countdown Cards */
     .hero-events{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:16px;
-      margin-top:28px;
+      margin-top:24px;
       width:100%;
       max-width:720px;
       text-align:left;
@@ -213,7 +224,7 @@
 
     .scroll{
       display:inline-block;
-      margin-top:36px;
+      margin-top:34px;
       color:var(--ivory);
       text-decoration:none;
       border-bottom:1px solid var(--gold);
@@ -455,9 +466,9 @@
         <span class="kicker-sub">Paris Fashion Week · SS27</span>
       </div>
       <h1 class="serif">
-        BECKY x MIU MIU
+        <span class="title-line">BECKY x MIU MIU</span>
         <span class="hero-amp">&</span>
-        FREEN x VALENTINO
+        <span class="title-line">FREEN x VALENTINO</span>
       </h1>
       <div class="hero-sub">Event Schedule & Live Timers</div>
 
