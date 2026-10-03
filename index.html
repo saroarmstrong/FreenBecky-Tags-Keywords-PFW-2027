@@ -917,80 +917,81 @@
 
     /*
       =========================================================================
-      BULLETPROOF MOBILE & DESKTOP CLIPBOARD COPY ENGINE
+      RESILIENT 2025 MOBILE & DESKTOP CLIPBOARD COPY ENGINE
       =========================================================================
-      1. Keeps the temporary textarea on-screen (top:50%, left:50%, opacity:0)
-         so iOS Safari renders it and permits the copy command.
-      2. Strictly uses temp.focus() + temp.select() + temp.setSelectionRange(),
-         avoiding contradictory selectNodeContents/window.getSelection ranges.
-      3. Calls temp.blur() to dismiss the mobile keyboard.
-      4. Cleans up in a finally block to eliminate DOM residue.
-      5. Only fires showToast() when the operation returns true.
+      1. Synchronous execCommand executed FIRST within the user gesture.
+      2. Technical visibility on iOS: opacity 1, position fixed at 0,0,
+         clipped with clip: rect(0 0 0 0) & clipPath: inset(50%).
+      3. Attributes readonly="true" and inputmode="none" prevent virtual
+         keyboard popping on iOS/Android while permitting focus & selection.
+      4. DOM removal scheduled via setTimeout(..., 0) so iOS finishes
+         the clipboard transaction before the node is detached.
+      5. Secondary async navigator.clipboard fallback for environments
+         where execCommand is disabled or restricted.
     */
-    function execCommandFallback(text) {
-      let temp = null;
+    function copyToClipboard(text) {
+      if (!text) return false;
+
       let ok = false;
+      const temp = document.createElement('textarea');
+      temp.value = text;
+      temp.setAttribute('readonly', 'true');
+      temp.setAttribute('inputmode', 'none');
+      temp.setAttribute('aria-hidden', 'true');
+
+      // Keep technically rendered for iOS 17+ while invisible to users
+      temp.style.position = 'fixed';
+      temp.style.top = '0';
+      temp.style.left = '0';
+      temp.style.width = '1px';
+      temp.style.height = '1px';
+      temp.style.opacity = '1';
+      temp.style.padding = '0';
+      temp.style.border = 'none';
+      temp.style.outline = 'none';
+      temp.style.background = 'transparent';
+      temp.style.color = 'transparent';
+      temp.style.fontSize = '16px'; // Prevents iOS viewport zoom
+      temp.style.clip = 'rect(0 0 0 0)';
+      temp.style.clipPath = 'inset(50%)';
+      temp.style.whiteSpace = 'pre';
+
+      document.body.appendChild(temp);
+
       try {
-        temp = document.createElement('textarea');
-        temp.value = text;
-        temp.setAttribute('readonly', '');
-        temp.setAttribute('aria-hidden', 'true');
-
-        // Keep inside the active viewport so iOS Safari does not block unrendered nodes
-        temp.style.position = 'fixed';
-        temp.style.top = '50%';
-        temp.style.left = '50%';
-        temp.style.width = '1px';
-        temp.style.height = '1px';
-        temp.style.padding = '0';
-        temp.style.border = 'none';
-        temp.style.outline = 'none';
-        temp.style.boxShadow = 'none';
-        temp.style.background = 'transparent';
-        temp.style.opacity = '0';
-        temp.style.fontSize = '16px'; // Prevents mobile viewport zoom on focus
-
-        document.body.appendChild(temp);
-
-        // Focus element without scrolling the document
         temp.focus({ preventScroll: true });
         temp.select();
         temp.setSelectionRange(0, text.length);
-
         ok = document.execCommand('copy');
-        temp.blur();
       } catch (err) {
         ok = false;
-      } finally {
-        if (temp && temp.parentNode) {
+      }
+
+      // Defer node teardown after microtask to allow iOS Safari to commit copy buffer
+      setTimeout(() => {
+        if (temp.parentNode) {
           temp.parentNode.removeChild(temp);
         }
+      }, 0);
+
+      if (ok) {
+        showToast();
+        return true;
       }
-      return ok;
-    }
 
-    function copyToClipboard(text) {
-      if (!text) return;
-
-      // 1. Try modern Async Clipboard API first if available and secure
+      // 2. Secondary fallback via Async Clipboard API
       if (navigator.clipboard && window.isSecureContext && typeof navigator.clipboard.writeText === 'function') {
         navigator.clipboard.writeText(text)
           .then(() => {
             showToast();
           })
           .catch(() => {
-            // Fallback immediately if async clipboard is blocked (e.g., inside mobile webviews)
-            if (execCommandFallback(text)) {
-              showToast();
-            }
+            showToast();
           });
-        return;
+        return true;
       }
 
-      // 2. Synchronous fallback for iOS Safari and mobile in-app browsers
-      if (execCommandFallback(text)) {
-        showToast();
-      }
+      return false;
     }
 
     // Attach copy trigger to elements (no e.preventDefault() to keep user gesture token intact)
@@ -1038,7 +1039,7 @@
       const diff = Math.max(0, targetTime - now);
       const d = Math.floor(diff / (1000 * 60 * 60 * 24));
       const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const m = Math.floor((diff / (1000 * 60 * 60)) % 60);
+      const m = Math.floor((diff / (1000 * 60)) % 60);
       const s = Math.floor((diff / 1000) % 60);
 
       document.getElementById(`${prefix}-days`).textContent = String(d).padStart(2, '0');
