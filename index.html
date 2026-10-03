@@ -27,6 +27,7 @@
       color:var(--ivory);
       font-family:Arial,"Noto Sans",sans-serif;
       line-height:1.5;
+      -webkit-tap-highlight-color:transparent;
     }
     button,select{font:inherit}
 
@@ -274,13 +275,18 @@
       justify-content:center;
       box-shadow:0 16px 40px rgba(45,34,21,.08);
       cursor:pointer;
+      user-select:none;
+      -webkit-user-select:none;
+      touch-action:manipulation;
       position:relative;
       transition:border-color .2s, box-shadow .2s, transform .15s;
+    }
+    .caption-card:active{
+      transform:scale(0.99);
     }
     .caption-card:hover{
       border-color:var(--gold);
       box-shadow:0 18px 44px rgba(45,34,21,.12);
-      transform:translateY(-1px);
     }
     .card-header{
       display:flex;
@@ -325,6 +331,7 @@
       text-transform:uppercase;
       transition:all .15s ease-in-out;
       text-align:center;
+      touch-action:manipulation;
     }
     .btn-becky{
       background:#26211d;
@@ -375,7 +382,13 @@
     }
     .campaign-block.copyable{
       cursor:pointer;
+      user-select:none;
+      -webkit-user-select:none;
+      touch-action:manipulation;
       transition:border-color .2s, background-color .2s;
+    }
+    .campaign-block.copyable:active{
+      background:rgba(208,178,125,.18);
     }
     .campaign-block.copyable:hover{
       border-color:var(--gold);
@@ -429,20 +442,21 @@
       position:fixed;
       left:50%;
       bottom:24px;
-      z-index:99;
+      z-index:9999;
       transform:translate(-50%,20px);
       opacity:0;
-      background:rgba(20, 18, 22, 0.92);
+      background:rgba(20, 18, 22, 0.95);
       color:#f8f4ec;
-      border:1px solid rgba(208, 178, 125, 0.35);
+      border:1px solid rgba(208, 178, 125, 0.45);
       padding:6px 14px;
       border-radius:999px;
       font-size:.7rem;
       font-weight:600;
       letter-spacing:.06em;
       text-transform:lowercase;
-      box-shadow:0 6px 18px rgba(0,0,0,0.5);
+      box-shadow:0 6px 18px rgba(0,0,0,0.6);
       backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);
       transition:.2s cubic-bezier(0.16, 1, 0.3, 1);
       pointer-events:none;
     }
@@ -911,41 +925,96 @@
       toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1500);
     }
 
-    function copyToClipboard(text) {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(showToast).catch(() => fallbackCopy(text));
+    /*
+      ===============================================================
+      PHONE & MOBILE-PROOF COPY ENGINE (iOS Safari, Android, In-App)
+      ===============================================================
+    */
+    function fallbackMobileCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      // Prevent screen jumping and zoom on mobile Safari
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '0';
+      ta.style.left = '0';
+      ta.style.width = '2em';
+      ta.style.height = '2em';
+      ta.style.padding = '0';
+      ta.style.border = 'none';
+      ta.style.outline = 'none';
+      ta.style.boxShadow = 'none';
+      ta.style.background = 'transparent';
+      ta.style.fontSize = '16px';
+      ta.style.opacity = '0.01';
+      document.body.appendChild(ta);
+
+      // iOS Safari selection range handling
+      const isIOS = navigator.userAgent.match(/ipad|ipod|iphone/i);
+      if (isIOS) {
+        const range = document.createRange();
+        range.selectNodeContents(ta);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        ta.setSelectionRange(0, 999999);
       } else {
-        fallbackCopy(text);
+        ta.focus();
+        ta.select();
+      }
+
+      let success = false;
+      try {
+        success = document.execCommand('copy');
+      } catch (err) {
+        success = false;
+      }
+
+      document.body.removeChild(ta);
+      if (success) {
+        showToast();
       }
     }
 
-    function fallbackCopy(text) {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      try {
-        document.execCommand('copy');
-        showToast();
-      } catch (e) {}
-      document.body.removeChild(ta);
+    function copyToClipboard(text) {
+      if (!text) return;
+
+      // Handle async Clipboard API if allowed and in secure context
+      if (window.isSecureContext && navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text)
+          .then(() => {
+            showToast();
+          })
+          .catch(() => {
+            fallbackMobileCopy(text);
+          });
+      } else {
+        fallbackMobileCopy(text);
+      }
     }
 
-    // Click on individual caption display cards to copy
-    document.getElementById('cardWord').addEventListener('click', () => {
-      copyToClipboard(textWordEl.textContent);
-    });
-    document.getElementById('cardShort').addEventListener('click', () => {
-      copyToClipboard(textShortEl.textContent);
-    });
-    document.getElementById('cardPost').addEventListener('click', () => {
-      copyToClipboard(textPostEl.textContent);
+    // Bind both tap/click with touch consideration
+    function addCopyTrigger(el, getTextFn) {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        const text = getTextFn();
+        copyToClipboard(text);
+      });
+    }
+
+    // Attach to caption display cards
+    addCopyTrigger(document.getElementById('cardWord'), () => textWordEl.textContent);
+    addCopyTrigger(document.getElementById('cardShort'), () => textShortEl.textContent);
+    addCopyTrigger(document.getElementById('cardPost'), () => textPostEl.textContent);
+
+    // Attach to campaign copyable boxes
+    document.querySelectorAll('.campaign-block.copyable').forEach(box => {
+      addCopyTrigger(box, () => box.getAttribute('data-copy'));
     });
 
     // Side-by-side Generate Next Buttons
-    document.getElementById('btnNextBecky').addEventListener('click', () => {
+    document.getElementById('btnNextBecky').addEventListener('click', (e) => {
+      e.preventDefault();
       currentTarget = 'Becky Armstrong';
       idxWord = getRandomIndex(masterPools.word, idxWord);
       idxShort = getRandomIndex(masterPools.short, idxShort);
@@ -953,22 +1022,13 @@
       renderCaptions();
     });
 
-    document.getElementById('btnNextFreen').addEventListener('click', () => {
+    document.getElementById('btnNextFreen').addEventListener('click', (e) => {
+      e.preventDefault();
       currentTarget = 'Freen Sarocha';
       idxWord = getRandomIndex(masterPools.word, idxWord);
       idxShort = getRandomIndex(masterPools.short, idxShort);
       idxPost = getRandomIndex(masterPools.post, idxPost);
       renderCaptions();
-    });
-
-    // Click to copy ONLY on copyable campaign tag boxes
-    document.querySelectorAll('.campaign-block.copyable').forEach(box => {
-      box.addEventListener('click', () => {
-        const textToCopy = box.getAttribute('data-copy');
-        if (textToCopy) {
-          copyToClipboard(textToCopy);
-        }
-      });
     });
 
     // Countdown Timers for Oct 4, 2026
