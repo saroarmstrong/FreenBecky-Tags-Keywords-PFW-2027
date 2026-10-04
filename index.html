@@ -365,7 +365,22 @@
       letter-spacing:.12em;
       font-weight:700;
     }
-    .campaign h3{font:400 1.7rem Georgia;margin:18px 0 8px;color:var(--ivory)}
+
+    /* 
+      FIX: Campaign heading stays on one line on phones.
+      - Reduced font size on very narrow screens.
+      - white-space:nowrap keeps it on a single line.
+      - clamp scales down gracefully.
+    */
+    .campaign h3{
+      font:400 clamp(1.05rem, 4.5vw, 1.7rem) Georgia;
+      margin:18px 0 8px;
+      color:var(--ivory);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      line-height:1.2;
+    }
     .campaign-desc{
       color:#c9c0b3;
       margin:0 0 16px;
@@ -474,6 +489,13 @@
       .wrap{width:min(100% - 24px, 760px)}
       .hero-events{grid-template-columns:1fr}
       .btn-row-side{grid-template-columns:1fr}
+      /* Extra safety: reduce campaign heading size on very small phones */
+      .campaign h3{font-size:1.05rem}
+    }
+
+    /* On extremely narrow screens (<380px) shrink a bit more */
+    @media(max-width:380px){
+      .campaign h3{font-size:0.95rem}
     }
   </style>
 </head>
