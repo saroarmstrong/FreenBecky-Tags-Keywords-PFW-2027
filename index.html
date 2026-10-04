@@ -25,7 +25,7 @@
       margin:0;
       background:var(--black);
       color:var(--ivory);
-      font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      font-family:Arial,"Noto Sans",sans-serif;
       line-height:1.5;
       -webkit-tap-highlight-color:transparent;
     }
@@ -35,9 +35,14 @@
       width:min(100% - 32px, 760px);
       margin:auto;
     }
-    .serif{font-family:Georgia, "Times New Roman", serif}
+    .serif{font-family:Georgia,"Times New Roman",serif}
 
-    /* Dual Ambient Lighting: Palais d'Iéna (Left) × Valentino Crimson (Right) */
+    /* 
+      =======================================================
+      THEME: PARIS FASHION WEEK SS27 DUAL HERO BACKGROUND
+      Miu Miu Travertine (Left) × Valentino Crimson (Right)
+      =======================================================
+    */
     .hero{
       min-height:100svh;
       display:grid;
@@ -104,6 +109,7 @@
       align-items:center;
     }
 
+    /* Two-line balanced responsive kicker */
     .kicker{
       display:inline-flex;
       flex-direction:column;
@@ -114,7 +120,7 @@
       width:100%;
       text-transform:uppercase;
     }
-    .kicker-brand{
+    .kicker-top{
       font-size:clamp(0.78rem, 2.8vw, 0.92rem);
       letter-spacing:clamp(0.28em, 1.2vw, 0.42em);
       color:var(--gold);
@@ -129,6 +135,7 @@
       white-space:nowrap;
     }
 
+    /* Fixed single-line heading per artist */
     h1{
       font-weight:400;
       font-size:clamp(1.75rem, 5.2vw, 3.1rem);
@@ -163,6 +170,7 @@
       max-width:520px;
     }
 
+    /* Event Countdown Cards */
     .hero-events{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -177,7 +185,6 @@
       background:var(--card-bg);
       padding:22px 18px;
       backdrop-filter:blur(8px);
-      -webkit-backdrop-filter:blur(8px);
       display:flex;
       flex-direction:column;
       justify-content:space-between;
@@ -259,7 +266,6 @@
       margin:18px 0;
     }
 
-    /* Tap-optimized interactive cards */
     .caption-card{
       background:#ffffff;
       border:1px solid #d8cdbd;
@@ -273,7 +279,10 @@
       -webkit-user-select:none;
       touch-action:manipulation;
       position:relative;
-      transition:border-color .2s, box-shadow .2s;
+      transition:border-color .2s, box-shadow .2s, transform .15s;
+    }
+    .caption-card:active{
+      transform:scale(0.99);
     }
     .caption-card:hover{
       border-color:var(--gold);
@@ -378,6 +387,9 @@
       touch-action:manipulation;
       transition:border-color .2s, background-color .2s;
     }
+    .campaign-block.copyable:active{
+      background:rgba(208,178,125,.18);
+    }
     .campaign-block.copyable:hover{
       border-color:var(--gold);
       background:rgba(20,18,15,.6);
@@ -437,8 +449,8 @@
     .toast{
       position:fixed;
       left:50%;
-      bottom:28px;
-      z-index:99999;
+      bottom:24px;
+      z-index:9999;
       transform:translate(-50%,20px);
       opacity:0;
       background:rgba(20, 18, 22, 0.95);
@@ -472,7 +484,7 @@
     <div class="hero-glow"></div>
     <div class="wrap hero-content">
       <div class="kicker">
-        <span class="kicker-brand">FREENBECKY</span>
+        <span class="kicker-top">FREENBECKY</span>
         <span class="kicker-sub">Paris Fashion Week · SS27</span>
       </div>
       <h1 class="serif">
@@ -486,7 +498,7 @@
         <!-- 1. BECKY ARMSTRONG (Miu Miu @ Palais d'Iéna) -->
         <div class="event-card card-becky">
           <div>
-            <h3 class="serif">🪽 Becky × Miu Miu</h3>
+            <h3 class="serif">Becky × Miu Miu</h3>
             <div class="event-info">
               <p>📅 <strong>October 4, 2026</strong></p>
               <p>🕑 <strong>Show Time:</strong></p>
@@ -513,7 +525,7 @@
         <!-- 2. FREEN SAROCHA (Maison Valentino) -->
         <div class="event-card card-freen">
           <div>
-            <h3 class="serif">🌷 Freen × Valentino</h3>
+            <h3 class="serif">Freen × Valentino</h3>
             <div class="event-info">
               <p>📅 <strong>October 4, 2026</strong></p>
               <p>🕑 <strong>Show Time:</strong></p>
@@ -560,7 +572,7 @@
           <article class="caption-card" id="cardWord" title="Click to copy">
             <div class="card-header">
               <span class="card-label">Comment (one-word)</span>
-              <span class="click-hint">Tap to copy</span>
+              <span class="click-hint">Click to copy</span>
             </div>
             <p class="quote" id="textWord">Loading...</p>
           </article>
@@ -569,7 +581,7 @@
           <article class="caption-card" id="cardShort" title="Click to copy">
             <div class="card-header">
               <span class="card-label">Comment (short phrase)</span>
-              <span class="click-hint">Tap to copy</span>
+              <span class="click-hint">Click to copy</span>
             </div>
             <p class="quote" id="textShort">Loading...</p>
           </article>
@@ -578,15 +590,15 @@
           <article class="caption-card" id="cardPost" title="Click to copy">
             <div class="card-header">
               <span class="card-label">Post Caption</span>
-              <span class="click-hint">Tap to copy</span>
+              <span class="click-hint">Click to copy</span>
             </div>
             <p class="quote" id="textPost">Loading...</p>
           </article>
         </div>
 
         <div class="btn-row-side">
-          <button class="btn btn-becky" id="btnNextBecky">🪽 GENERATE NEXT (BECKY)</button>
-          <button class="btn btn-freen" id="btnNextFreen">🌷 GENERATE NEXT (FREEN)</button>
+          <button class="btn btn-becky" id="btnNextBecky">GENERATE NEXT (BECKY)</button>
+          <button class="btn btn-freen" id="btnNextFreen">GENERATE NEXT (FREEN)</button>
         </div>
       </section>
 
@@ -601,53 +613,14 @@
 
         <div class="campaign-list">
           
-          <!-- 1. BECKY ARMSTRONG CAMPAIGN -->
-          <div class="campaign">
-            <div class="lock">● ACTIVE · MIU MIU SS27</div>
-            <h3>🪽 Becky Armstrong × Miu Miu</h3>
-            <p class="campaign-desc">Becky Armstrong is attending the showcase of the Miu Miu Spring/Summer 2027 collection at Paris Fashion Week. 4 October 2026 · 1:00 PM CEST / 6:00 PM TH at Palais d'Iéna, Paris, France. Trending starts on October 4 at 12:30 PM CEST / 5:30 PM TH.<br><br>💡 <em>Reminder: If you repost Instagram Stories, remember to mention <strong>@beccca</strong> and <strong>@miumiu</strong>.</em><br><br>🎥 <strong>Watch the live stream:</strong> <a href="https://www.youtube.com/watch?v=mIsFARBSg0E" target="_blank" rel="noopener noreferrer">https://www.youtube.com/watch?v=mIsFARBSg0E</a></p>
-            
-            <!-- Show Day / Trending Tags (moved before pre-trend tags) -->
-            <div class="campaign-block copyable" data-copy="REBECCA X MIU MIU PFWSS27&#10;#MiuMiuSS27xBecky&#10;#MiuMiuPFWxBecky&#10;#beckysangels #BeckyArmstrong" title="Click to copy tags">
-              <span class="copy-hint">Tap to copy</span>
-              <span class="platform-label">SHOW DAY HASHTAG — START TRENDING (12:30 PM CEST / 5:30 PM TH)</span>
-              <div class="code-content">
-                REBECCA X MIU MIU PFWSS27<br>
-                #MiuMiuSS27xBecky<br>
-                #MiuMiuPFWxBecky<br>
-                #beckysangels #BeckyArmstrong
-              </div>
-            </div>
-
-            <!-- Exact pre-trend tags (now after show day tags) -->
-            <div class="campaign-block copyable" data-copy="#MiuMiuPFWxBecky #MiuMiuSS27&#10;#beckysangels #BeckyArmstrong" title="Click to copy tags">
-              <span class="copy-hint">Tap to copy</span>
-              <span class="platform-label">TAGS BEFORE TRENDING TIME</span>
-              <div class="code-content">
-                #MiuMiuPFWxBecky #MiuMiuSS27<br>
-                #beckysangels #BeckyArmstrong
-              </div>
-            </div>
-
-            <div class="campaign-block">
-              <span class="platform-label">OFFICIAL ACCOUNTS</span>
-              <div class="code-content">
-                <strong>X ACCOUNTS</strong><br>
-                @MIUMIUOfficial<br><br>
-                <strong>INSTAGRAM ACCOUNT</strong><br>
-                @miumiu
-              </div>
-            </div>
-          </div>
-
-          <!-- 2. FREEN SAROCHA CAMPAIGN -->
+          <!-- 1. FREEN SAROCHA CAMPAIGN (moved before Becky) -->
           <div class="campaign">
             <div class="lock">● ACTIVE · MAISON VALENTINO SS27</div>
-            <h3>🌷 Freen Sarocha × Maison Valentino</h3>
-            <p class="campaign-desc">Meet Freen at the Maison Valentino Spring/Summer 2027 Fashion Show. 4 October 2026 · 3:30 PM CEST / 8:30 PM TH in Paris, France. Trending starts on October 4 at 3:30 PM CEST / 8:30 PM TH. The tags can be used throughout Freen’s trip to Paris starting from the Airport Look.<br><br>💡 <em>Reminder: If you repost Instagram Stories, remember to mention <strong>@srchafreen</strong> and <strong>@maisonvalentino</strong>.</em></p>
+            <h3>Freen Sarocha × Maison Valentino</h3>
+            <p class="campaign-desc">Meet Freen at the Maison Valentino Spring/Summer 2027 Fashion Show. 4 October 2026 · 3:30 PM CEST / 8:30 PM TH in Paris, France. Trending starts on October 4 at 3:30 PM CEST / 8:30 PM TH. The tags can be used throughout Freen’s trip to Paris starting from the Airport Look.<br><br>💡 <em>Reminder: If you repost Instagram Stories, remember to mention <strong>@srchafreen</strong>, <strong>@maisonvalentino</strong>, and <strong>@alessandro_michele</strong>.</em><br><br>🎥 <strong>Watch the live stream:</strong> <a href="https://www.youtube.com/live/I3sZKmb42Lw" target="_blank" rel="noopener noreferrer">https://www.youtube.com/live/I3sZKmb42Lw</a></p>
 
             <div class="campaign-block copyable" data-copy="SAROCHA X VALENTINO PFW SS27&#10;#ValentinoSS27xFreen&#10;#srchafreen #ValentinoGaravani" title="Click to copy tags">
-              <span class="copy-hint">Tap to copy</span>
+              <span class="copy-hint">Click to copy</span>
               <span class="platform-label">KEYWORD & HASHTAGS FOR THROUGHOUT THE TRIP</span>
               <div class="code-content">
                 SAROCHA X VALENTINO PFW SS27<br>
@@ -670,6 +643,45 @@
                 @valentinoTH @maisonvalentino<br><br>
                 <strong>INSTAGRAM ACCOUNTS</strong><br>
                 @maisonvalentino @alessandro_michele
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. BECKY ARMSTRONG CAMPAIGN (moved after Freen) -->
+          <div class="campaign">
+            <div class="lock">● ACTIVE · MIU MIU SS27</div>
+            <h3>Becky Armstrong × Miu Miu</h3>
+            <p class="campaign-desc">Becky Armstrong is attending the showcase of the Miu Miu Spring/Summer 2027 collection at Paris Fashion Week. 4 October 2026 · 1:00 PM CEST / 6:00 PM TH at Palais d'Iéna, Paris, France. Trending starts on October 4 at 12:30 PM CEST / 5:30 PM TH.<br><br>💡 <em>Reminder: If you repost Instagram Stories, remember to mention <strong>@beccca</strong> and <strong>@miumiu</strong>.</em><br><br>🎥 <strong>Watch the live stream:</strong> <a href="https://www.youtube.com/watch?v=mIsFARBSg0E" target="_blank" rel="noopener noreferrer">https://www.youtube.com/watch?v=mIsFARBSg0E</a></p>
+            
+            <!-- SHOW DAY / TRENDING TAGS (moved before pre-trend tags) -->
+            <div class="campaign-block copyable" data-copy="REBECCA X MIU MIU PFWSS27&#10;#MiuMiuSS27xBecky&#10;#MiuMiuPFWxBecky&#10;#beckysangels #BeckyArmstrong" title="Click to copy tags">
+              <span class="copy-hint">Click to copy</span>
+              <span class="platform-label">SHOW DAY HASHTAG — START TRENDING (12:30 PM CEST / 5:30 PM TH)</span>
+              <div class="code-content">
+                REBECCA X MIU MIU PFWSS27<br>
+                #MiuMiuSS27xBecky<br>
+                #MiuMiuPFWxBecky<br>
+                #beckysangels #BeckyArmstrong
+              </div>
+            </div>
+
+            <!-- FIXED DATA-COPY ATTRIBUTE FOR PRE-TREND TAGS -->
+            <div class="campaign-block copyable" data-copy="#MiuMiuPFWxBecky #MiuMiuSS27&#10;#beckysangels #BeckyArmstrong" title="Click to copy tags">
+              <span class="copy-hint">Click to copy</span>
+              <span class="platform-label">TAGS BEFORE TRENDING TIME</span>
+              <div class="code-content">
+                #MiuMiuPFWxBecky #MiuMiuSS27<br>
+                #beckysangels #BeckyArmstrong
+              </div>
+            </div>
+
+            <div class="campaign-block">
+              <span class="platform-label">OFFICIAL ACCOUNTS</span>
+              <div class="code-content">
+                <strong>X ACCOUNTS</strong><br>
+                @MIUMIUOfficial<br><br>
+                <strong>INSTAGRAM ACCOUNT</strong><br>
+                @miumiu
               </div>
             </div>
           </div>
@@ -913,123 +925,104 @@
       textPostEl.textContent = masterPools.post[idxPost].replace(/\[NAME\]/g, currentTarget);
     }
 
-    let toastTimer = null;
+    let toastTimer;
     function showToast() {
       toastEl.textContent = 'copied';
       toastEl.classList.add('show');
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => {
-        toastEl.classList.remove('show');
-      }, 1500);
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1500);
     }
 
-    /* =========================================================================
-       UPDATED UNIVERSAL CLIPBOARD ENGINE (works on all mobile platforms)
-       =========================================================================
-       1. Uses a visible, selectable textarea that is temporarily fixed to 0,0.
-       2. Uses .select() + .setSelectionRange() for compatibility.
-       3. Falls back to navigator.clipboard.writeText if execCommand fails.
-       4. Handles iOS 15+ and Android Chrome, Samsung Internet, Firefox.
-    ========================================================================= */
-    function copyToClipboard(text) {
-      if (!text) return false;
+    /*
+      ===============================================================
+      PHONE & MOBILE-PROOF COPY ENGINE (iOS Safari, Android, In-App)
+      ===============================================================
+    */
+    function fallbackMobileCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      // Prevent screen jumping and zoom on mobile Safari
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '0';
+      ta.style.left = '0';
+      ta.style.width = '2em';
+      ta.style.height = '2em';
+      ta.style.padding = '0';
+      ta.style.border = 'none';
+      ta.style.outline = 'none';
+      ta.style.boxShadow = 'none';
+      ta.style.background = 'transparent';
+      ta.style.fontSize = '16px';
+      ta.style.opacity = '0.01';
+      document.body.appendChild(ta);
 
-      // --- Primary method: execCommand with a carefully crafted textarea ---
-      const textarea = document.createElement('textarea');
-      textarea.value = text;
-
-      // Make it invisible but still interactable for selection
-      textarea.setAttribute('readonly', '');
-      textarea.setAttribute('aria-hidden', 'true');
-      textarea.style.position = 'fixed';
-      textarea.style.top = '0';
-      textarea.style.left = '0';
-      textarea.style.width = '2em';
-      textarea.style.height = '2em';
-      textarea.style.padding = '0';
-      textarea.style.border = 'none';
-      textarea.style.outline = 'none';
-      textarea.style.boxShadow = 'none';
-      textarea.style.background = 'transparent';
-      textarea.style.color = 'transparent';
-      textarea.style.caretColor = 'transparent';
-      textarea.style.fontSize = '16px'; // prevents zoom on focus (iOS)
-      textarea.style.opacity = '0';     // invisible but still selectable
-
-      document.body.appendChild(textarea);
-
-      // Save any current selection to restore later
-      const activeElement = document.activeElement;
-
-      try {
-        // Focus and select the content
-        textarea.focus({ preventScroll: true });
-        textarea.select();
-        textarea.setSelectionRange(0, text.length);
-
-        // Execute copy command
-        const successful = document.execCommand('copy');
-
-        // Clean up
-        document.body.removeChild(textarea);
-
-        if (successful) {
-          if (activeElement && activeElement.focus) {
-            activeElement.focus({ preventScroll: true });
-          }
-          showToast();
-          return true;
-        }
-      } catch (err) {
-        // Remove the textarea if it's still in the DOM
-        if (textarea.parentNode) {
-          document.body.removeChild(textarea);
-        }
-        // Fall through to navigator.clipboard fallback
+      // iOS Safari selection range handling
+      const isIOS = navigator.userAgent.match(/ipad|ipod|iphone/i);
+      if (isIOS) {
+        const range = document.createRange();
+        range.selectNodeContents(ta);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        ta.setSelectionRange(0, 999999);
+      } else {
+        ta.focus();
+        ta.select();
       }
 
-      // --- Fallback: Async Clipboard API (modern browsers) ---
-      if (navigator.clipboard && window.isSecureContext && typeof navigator.clipboard.writeText === 'function') {
+      let success = false;
+      try {
+        success = document.execCommand('copy');
+      } catch (err) {
+        success = false;
+      }
+
+      document.body.removeChild(ta);
+      if (success) {
+        showToast();
+      }
+    }
+
+    function copyToClipboard(text) {
+      if (!text) return;
+
+      // Handle async Clipboard API if allowed and in secure context
+      if (window.isSecureContext && navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text)
           .then(() => {
             showToast();
           })
           .catch(() => {
-            // Final fallback: prompt user to copy manually if all else fails
-            // (rare, but ensures some feedback)
-            showToast();
+            fallbackMobileCopy(text);
           });
-        return true;
+      } else {
+        fallbackMobileCopy(text);
       }
-
-      // If we reach here, copying failed silently — show a friendly message
-      // (we still show toast to avoid frustration; user can long-press to copy)
-      showToast();
-      return false;
     }
 
-    // Attach copy trigger to elements
-    function bindCopy(el, getTextFn) {
-      if (!el) return;
+    // Bind both tap/click with touch consideration
+    function addCopyTrigger(el, getTextFn) {
       el.addEventListener('click', (e) => {
-        // Do not preventDefault so user gesture token remains valid
+        e.preventDefault();
         const text = getTextFn();
         copyToClipboard(text);
       });
     }
 
-    // Bind to caption display cards
-    bindCopy(document.getElementById('cardWord'), () => textWordEl.textContent);
-    bindCopy(document.getElementById('cardShort'), () => textShortEl.textContent);
-    bindCopy(document.getElementById('cardPost'), () => textPostEl.textContent);
+    // Attach to caption display cards
+    addCopyTrigger(document.getElementById('cardWord'), () => textWordEl.textContent);
+    addCopyTrigger(document.getElementById('cardShort'), () => textShortEl.textContent);
+    addCopyTrigger(document.getElementById('cardPost'), () => textPostEl.textContent);
 
-    // Bind to all campaign copyable boxes
+    // Attach to campaign copyable boxes
     document.querySelectorAll('.campaign-block.copyable').forEach(box => {
-      bindCopy(box, () => box.getAttribute('data-copy'));
+      addCopyTrigger(box, () => box.getAttribute('data-copy'));
     });
 
     // Side-by-side Generate Next Buttons
-    document.getElementById('btnNextBecky').addEventListener('click', () => {
+    document.getElementById('btnNextBecky').addEventListener('click', (e) => {
+      e.preventDefault();
       currentTarget = 'Becky Armstrong';
       idxWord = getRandomIndex(masterPools.word, idxWord);
       idxShort = getRandomIndex(masterPools.short, idxShort);
@@ -1037,7 +1030,8 @@
       renderCaptions();
     });
 
-    document.getElementById('btnNextFreen').addEventListener('click', () => {
+    document.getElementById('btnNextFreen').addEventListener('click', (e) => {
+      e.preventDefault();
       currentTarget = 'Freen Sarocha';
       idxWord = getRandomIndex(masterPools.word, idxWord);
       idxShort = getRandomIndex(masterPools.short, idxShort);
@@ -1054,7 +1048,7 @@
       const diff = Math.max(0, targetTime - now);
       const d = Math.floor(diff / (1000 * 60 * 60 * 24));
       const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const m = Math.floor((diff / (1000 * 60)) % 60);
+      const m = Math.floor((diff / 1000 / 60) % 60);
       const s = Math.floor((diff / 1000) % 60);
 
       document.getElementById(`${prefix}-days`).textContent = String(d).padStart(2, '0');
