@@ -367,20 +367,20 @@
     }
 
     /* 
-      FIX: Campaign heading stays on one line on phones.
-      - Reduced font size on very narrow screens.
-      - white-space:nowrap keeps it on a single line.
-      - clamp scales down gracefully.
+      Campaign heading: original large font size.
+      On desktop the .phone-break <br> is hidden (display:none),
+      so the heading shows as a single line.
     */
     .campaign h3{
-      font:400 clamp(1.05rem, 4.5vw, 1.7rem) Georgia;
+      font:400 1.7rem Georgia;
       margin:18px 0 8px;
       color:var(--ivory);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
       line-height:1.2;
     }
+
+    /* By default, hide the phone-only line break */
+    .phone-break{display:none}
+
     .campaign-desc{
       color:#c9c0b3;
       margin:0 0 16px;
@@ -489,13 +489,10 @@
       .wrap{width:min(100% - 24px, 760px)}
       .hero-events{grid-template-columns:1fr}
       .btn-row-side{grid-template-columns:1fr}
-      /* Extra safety: reduce campaign heading size on very small phones */
-      .campaign h3{font-size:1.05rem}
-    }
-
-    /* On extremely narrow screens (<380px) shrink a bit more */
-    @media(max-width:380px){
-      .campaign h3{font-size:0.95rem}
+      /* Show the phone line break so heading splits into two lines on phones */
+      .phone-break{display:inline}
+      /* Slightly tighten line height for the two-line heading */
+      .campaign h3{line-height:1.25}
     }
   </style>
 </head>
@@ -635,10 +632,10 @@
 
         <div class="campaign-list">
           
-          <!-- 1. FREEN SAROCHA CAMPAIGN (moved before Becky) -->
+          <!-- 1. FREEN SAROCHA CAMPAIGN -->
           <div class="campaign">
             <div class="lock">● ACTIVE · MAISON VALENTINO SS27</div>
-            <h3>Freen Sarocha × Maison Valentino</h3>
+            <h3>Freen Sarocha ×<br class="phone-break"> Maison Valentino</h3>
             <p class="campaign-desc">Meet Freen at the Maison Valentino Spring/Summer 2027 Fashion Show. 4 October 2026 · 3:30 PM CEST / 8:30 PM TH in Paris, France. Trending starts on October 4 at 3:30 PM CEST / 8:30 PM TH. The tags can be used throughout Freen’s trip to Paris starting from the Airport Look.<br><br>💡 <em>Reminder: If you repost Instagram Stories, remember to mention <strong>@srchafreen</strong>, <strong>@maisonvalentino</strong>, and <strong>@alessandro_michele</strong>.</em><br><br>🎥 <strong>Watch the live stream:</strong> <a href="https://www.youtube.com/live/I3sZKmb42Lw" target="_blank" rel="noopener noreferrer">https://www.youtube.com/live/I3sZKmb42Lw</a></p>
 
             <div class="campaign-block copyable" data-copy="SAROCHA X VALENTINO PFW SS27&#10;#ValentinoSS27xFreen&#10;#srchafreen #ValentinoGaravani" title="Click to copy tags">
@@ -669,13 +666,13 @@
             </div>
           </div>
 
-          <!-- 2. BECKY ARMSTRONG CAMPAIGN (moved after Freen) -->
+          <!-- 2. BECKY ARMSTRONG CAMPAIGN -->
           <div class="campaign">
             <div class="lock">● ACTIVE · MIU MIU SS27</div>
-            <h3>Becky Armstrong × Miu Miu</h3>
+            <h3>Becky Armstrong ×<br class="phone-break"> Miu Miu</h3>
             <p class="campaign-desc">Becky Armstrong is attending the showcase of the Miu Miu Spring/Summer 2027 collection at Paris Fashion Week. 4 October 2026 · 1:00 PM CEST / 6:00 PM TH at Palais d'Iéna, Paris, France. Trending starts on October 4 at 12:30 PM CEST / 5:30 PM TH.<br><br>💡 <em>Reminder: If you repost Instagram Stories, remember to mention <strong>@beccca</strong> and <strong>@miumiu</strong>.</em><br><br>🎥 <strong>Watch the live stream:</strong> <a href="https://www.youtube.com/watch?v=mIsFARBSg0E" target="_blank" rel="noopener noreferrer">https://www.youtube.com/watch?v=mIsFARBSg0E</a></p>
             
-            <!-- SHOW DAY / TRENDING TAGS (moved before pre-trend tags) -->
+            <!-- SHOW DAY / TRENDING TAGS -->
             <div class="campaign-block copyable" data-copy="REBECCA X MIU MIU PFWSS27&#10;#MiuMiuSS27xBecky&#10;#MiuMiuPFWxBecky&#10;#beckysangels #BeckyArmstrong" title="Click to copy tags">
               <span class="copy-hint">Click to copy</span>
               <span class="platform-label">SHOW DAY HASHTAG — START TRENDING (12:30 PM CEST / 5:30 PM TH)</span>
